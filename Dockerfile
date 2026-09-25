@@ -1,7 +1,8 @@
-FROM php:8.2-apache
+FROM dolibarr/dolibarr:latest
 
-RUN apache2ctl -M
-
-EXPOSE 80
+RUN a2dismod mpm_event 2>/dev/null || true \
+    && a2dismod mpm_worker 2>/dev/null || true \
+    && a2dismod mpm_prefork 2>/dev/null || true \
+    && a2enmod mpm_prefork
 
 CMD ["apache2-foreground"]
