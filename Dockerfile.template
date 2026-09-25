@@ -104,8 +104,8 @@ RUN curl -fLSs https://github.com/Dolibarr/dolibarr/archive/${DOLI_VERSION}.tar.
     chmod -R u-w /var/www/html
 
 EXPOSE 80
-VOLUME /var/www/documents
-VOLUME /var/www/html/custom
+# VOLUME /var/www/documents
+# VOLUME /var/www/html/custom
 
 COPY docker-init.php /var/www/scripts/
 COPY docker-run.sh /usr/local/bin/
