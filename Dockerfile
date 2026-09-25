@@ -1,8 +1,7 @@
 FROM dolibarr/dolibarr:latest
 
-RUN a2dismod mpm_event 2>/dev/null || true \
-    && a2dismod mpm_worker 2>/dev/null || true \
-    && a2dismod mpm_prefork 2>/dev/null || true \
-    && a2enmod mpm_prefork
+COPY railway-entrypoint.sh /usr/local/bin/railway-entrypoint.sh
 
-CMD ["apache2-foreground"]
+RUN chmod +x /usr/local/bin/railway-entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/railway-entrypoint.sh"]
