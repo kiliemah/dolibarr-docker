@@ -25,23 +25,33 @@ RUN apt-get update && apt-get install -y \
         opcache \
     && rm -rf /var/lib/apt/lists/*
 
-# Ensure only Apache prefork MPM is enabled
-RUN a2dismod mpm_event mpm_worker mpm_dynamic 2>/dev/null || true \
-    && a2enmod mpm_prefork \
-    && a2enmod rewrite
+# Remove ALL Apache MPM modules/configuration
+RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
+          /etc/apache2/mods-enabled/mpm_*.conf \
+          /etc/apache2/mods-available/mpm_*.load \
+          /etc/apache2/mods-available/mpm_*.conf
+
+# Re-create only prefork MPM
+RUN a2enmod mpm_prefork rewrite
 
 WORKDIR /var/www/html
 
-RUN curl -fsSL https://www.dolibarr.org/files/stable/standard/dolibarr-24.0.1.tgz \
+RUN curl -fsSL \
+    https://www.dolibarr.org/files/stable/standard/dolibarr-24.0.1.tgz \
     -o /tmp/dolibarr.tgz \
-    && tar -xzf /tmp/dolibarr.tgz --strip-components=1 -C /var/www/html \
+    && tar -xzf /tmp/dolibarr.tgz \
+       --strip-components=1 \
+       -C /var/www/html \
     && rm /tmp/dolibarr.tgz
 
 RUN mkdir -p /var/www/documents \
-    && mkdir -p /var/www/html/custom \
-    && chown -R www-data:www-data /var/www/html /var/www/documents
+    /var/www/html/custom \
+    && chown -R www-data:www-data \
+       /var/www/html \
+       /var/www/documents
 
 COPY railway-start.sh /usr/local/bin/railway-start.sh
+
 RUN chmod +x /usr/local/bin/railway-start.sh
 
 EXPOSE 80
