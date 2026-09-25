@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     unzip \
     git \
+    curl \
     default-mysql-client \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install \
@@ -24,7 +25,10 @@ RUN apt-get update && apt-get install -y \
         opcache \
     && rm -rf /var/lib/apt/lists/*
 
-RUN a2enmod rewrite
+# Ensure only Apache prefork MPM is enabled
+RUN a2dismod mpm_event mpm_worker mpm_dynamic 2>/dev/null || true \
+    && a2enmod mpm_prefork \
+    && a2enmod rewrite
 
 WORKDIR /var/www/html
 
