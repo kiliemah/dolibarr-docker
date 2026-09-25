@@ -28,7 +28,8 @@ RUN a2enmod rewrite
 
 WORKDIR /var/www/html
 
-RUN curl -fsSL https://www.dolibarr.org/files/stable/dolibarr.tgz -o /tmp/dolibarr.tgz \
+RUN curl -fsSL https://www.dolibarr.org/files/stable/standard/dolibarr-24.0.1.tgz \
+    -o /tmp/dolibarr.tgz \
     && tar -xzf /tmp/dolibarr.tgz --strip-components=1 -C /var/www/html \
     && rm /tmp/dolibarr.tgz
 
