@@ -1,17 +1,18 @@
 #!/bin/bash
+
 set -e
 
-mkdir -p /var/www/documents
-mkdir -p /var/www/html/custom
+echo "=== Fixing Apache MPM configuration ==="
 
-chown -R www-data:www-data /var/www/documents
-chown -R www-data:www-data /var/www/html/custom
+a2dismod mpm_event 2>/dev/null || true
+a2dismod mpm_worker 2>/dev/null || true
+a2dismod mpm_prefork 2>/dev/null || true
 
-echo "=== Apache MPM modules ==="
+a2enmod mpm_prefork
+
+echo "=== Enabled MPM modules ==="
 apache2ctl -M 2>&1 | grep mpm || true
 
-echo "=== Apache configuration test ==="
-apache2ctl configtest
+echo "=== Starting Dolibarr ==="
 
-echo "=== Starting Apache ==="
 exec apache2-foreground
