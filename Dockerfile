@@ -1,0 +1,44 @@
+FROM php:8.2-apache
+
+RUN apt-get update && apt-get install -y \
+    libicu-dev \
+    libzip-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libxml2-dev \
+    libonig-dev \
+    unzip \
+    git \
+    default-mysql-client \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install \
+        mysqli \
+        pdo \
+        pdo_mysql \
+        intl \
+        zip \
+        gd \
+        mbstring \
+        xml \
+        opcache \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN a2enmod rewrite
+
+WORKDIR /var/www/html
+
+RUN curl -fsSL https://www.dolibarr.org/files/stable/dolibarr.tgz -o /tmp/dolibarr.tgz \
+    && tar -xzf /tmp/dolibarr.tgz --strip-components=1 -C /var/www/html \
+    && rm /tmp/dolibarr.tgz
+
+RUN mkdir -p /var/www/documents \
+    && mkdir -p /var/www/html/custom \
+    && chown -R www-data:www-data /var/www/html /var/www/documents
+
+COPY railway-start.sh /usr/local/bin/railway-start.sh
+RUN chmod +x /usr/local/bin/railway-start.sh
+
+EXPOSE 80
+
+CMD ["/usr/local/bin/railway-start.sh"]
